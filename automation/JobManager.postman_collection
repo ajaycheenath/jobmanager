@@ -1,0 +1,42 @@
+{
+	"variables": [],
+	"info": {
+		"name": "JobManager",
+		"_postman_id": "d02e30f5-7f8a-decd-4cc2-6fcf1078c328",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Add Job ",
+			"request": {
+				"url": "localhost:8080/job/add/reachability",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"jobName\": \"google5.com\",\n\t\"jobPriority\": \"MEDIUM\",\n\t\"runAt\": \"1562027496450\",\n\t\"configs\" : {\n\t\t\"url\" : \"https://google.com\"\n\t}\n}"
+				},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Get all jobs",
+			"request": {
+				"url": "localhost:8080/job",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
