@@ -51,13 +51,13 @@ public class JobManagerTest {
 	@MockBean
 	private CommonUtils utils;
 	
-	private Logger logger = LoggerFactory.getLogger(JobManagerTest.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(JobManagerTest.class);
 
 	/**
 	 * verify the application context is set properly
 	 */
 	@Test
-	public void verifyContextInitiated_Test() {
+	public void verifyContextInitiated() {
 		assertNotNull(applicationContext);
 	}
 
@@ -80,7 +80,7 @@ public class JobManagerTest {
 			public void stateChange(UUID jobId, String jobName, JobState event) {
 				if(event == JobState.SUCCESS) {
 					synchronized (job) {
-						logger.debug("---- Done with : {}", job);
+						LOGGER.debug("---- Done with : {}", job);
 						jobs.add(job);
 					}
 				}
@@ -119,12 +119,12 @@ public class JobManagerTest {
 		while(true) {
 			if(jobs.size() == 5) {
 				for(Job job : jobs) {
-					logger.info("Completed job : {}", job);
+					LOGGER.info("Completed job : {}", job);
 				}
 				break;
 			}
-			logger.debug("No of completed jobs : {}"+jobs.size());
 			Thread.sleep(1000);
+			LOGGER.debug("No of completed jobs : {}", jobs.size());
 		}
 		
 		assertEquals(jobs.get(0).getJobName(), "job5");

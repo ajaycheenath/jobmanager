@@ -40,7 +40,7 @@ public class JobController {
 	@Autowired
 	private JobDAO dao;
 
-	private Logger logger = LoggerFactory.getLogger(JobController.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(JobController.class);
 	
 	/**
 	 * This method provide list of jobs and job details(current status) 
@@ -52,7 +52,7 @@ public class JobController {
 	 */
 	@RequestMapping(method = RequestMethod.GET, value= {"", "/{jobId}"})
 	public @ResponseBody ResponseEntity<List<Job>> addJob(@PathVariable(value="jobId", required=false) UUID jobId) throws Exception {
-		logger.info("/GET /job/ - {}", jobId);
+		LOGGER.info("/GET /job/ - {}", jobId);
 		List<Job> jobs = dao.getAllJobs();
 		return new ResponseEntity<List<Job>>(jobs, HttpStatus.OK);
 	}
@@ -65,7 +65,7 @@ public class JobController {
 	 */
 	@RequestMapping(method = RequestMethod.POST, value="/add/{jobType}")
 	public @ResponseBody ResponseEntity<String> addJob(@PathVariable(value="jobType") String jobType, @RequestBody Job job) throws Exception {
-		logger.info("/POST /job/add/{}", jobType);
+		LOGGER.info("/POST /job/add/{}", jobType);
 		JobExecutor jobExecutor = null;
 		job.setCreatedTime(System.currentTimeMillis());
 		try {
@@ -77,7 +77,7 @@ public class JobController {
 			jobManager.addJob(job, jobExecutor);
 		}
 		catch(Exception e) {
-			logger.error("/add/{jobType} ", e);
+			LOGGER.error("/add/{jobType} ", e);
 			return new ResponseEntity<String>("ERROR: "+e.getMessage(), HttpStatus.BAD_REQUEST);//TODO: use string constant
 		}	
 			return new ResponseEntity<String>("Successfully added Job id: "+job.getJobId(), HttpStatus.OK);//TODO: use string constant

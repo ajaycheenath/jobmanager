@@ -26,7 +26,7 @@ public class JobManager {
 	private ExecutorService executor; 
 	//TODO: Having more number of threads to process can improve performance, when changing consider changing unit test job verification order
 	private PriorityBlockingQueue<JobExecutor> priorityJobQueue;
-	private Logger logger = LoggerFactory.getLogger(JobManager.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(JobManager.class);
 	
 
 	@Value("${job.executor.pool.size}")
@@ -52,18 +52,18 @@ public class JobManager {
 				Comparator.comparing(JobExecutor::getJob, Comparator.comparing(Job::getRunAt))
 				.thenComparing(JobExecutor::getJob, Comparator.comparing(Job::getJobPriorityValue))
 				.thenComparing(JobExecutor::getJob, Comparator.comparing(Job::getCreatedTime)));
-		logger.info("Job Manager Service intialized with poolSize = {} and queueSize = {}", executorPoolSize, queueSize);
+		LOGGER.info("Job Manager Service intialized with poolSize = {} and queueSize = {}", executorPoolSize, queueSize);
 		executor.execute(()->{
 			while (true) {
 				try {
 					JobExecutor jobExecutor = priorityJobQueue.peek();
 					if(jobExecutor == null) {
 						synchronized (this) {
-							logger.debug("Waiting for new Job");
+							LOGGER.debug("Waiting for new Job");
 							wait();
 							jobExecutor = priorityJobQueue.peek();//Handle new Job added into the Queue
 							if(jobExecutor == null) {
-								logger.debug("******* JOB = "+jobExecutor);
+								LOGGER.debug("******* JOB = "+jobExecutor);
 								continue;
 							}
 						}
@@ -72,17 +72,17 @@ public class JobManager {
 					//Find when to execute next(head) job ?
 					Job job = jobExecutor.getJob();
 					long waitTime = job.getRunAt() - System.currentTimeMillis();
-					logger.debug("waitTime = "+waitTime+", "+job.getRunAt() +" = "+System.currentTimeMillis());
+					LOGGER.debug("waitTime = "+waitTime+", "+job.getRunAt() +" = "+System.currentTimeMillis());
 					if(waitTime > 0) {
 						synchronized (this) {
-							logger.debug("Job "+job.getJobName()+" will be execute after "+waitTime+"ms");
+							LOGGER.debug("Job "+job.getJobName()+" will be execute after "+waitTime+"ms");
 							wait(waitTime);
 						}
 					}else {
 						priorityJobPoolExecutor.execute(priorityJobQueue.take());
 					}
 				} catch (InterruptedException e) {
-					logger.debug("Wait interrupted ", e);
+					LOGGER.debug("Wait interrupted ", e);
 					break;
 				}
 			}
@@ -98,7 +98,7 @@ public class JobManager {
 	 * @throws Exception
 	 */
 	public synchronized Job addJob(Job job, JobExecutor jobExecutor) throws Exception {
-		logger.info("/addJob - Job ID = {}", job);
+		LOGGER.info("/addJob - Job ID = {}", job);
 		jobExecutor.validate(job);
 		jobExecutor.setJob(job);
 		priorityJobQueue.add(jobExecutor);

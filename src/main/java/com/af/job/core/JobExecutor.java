@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.af.job.config.JobConfigValidationException;
 import com.af.job.dao.JobDAO;
 
 /**
@@ -22,7 +23,7 @@ public abstract class JobExecutor implements Runnable{
 	
 	@Autowired
 	private JobDAO dao;
-	private Logger logger = LoggerFactory.getLogger(JobExecutor.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(JobExecutor.class);
 	
 	/**
 	 * Validate is an abstract method which will have to be implemented by the child concrete class 
@@ -30,7 +31,7 @@ public abstract class JobExecutor implements Runnable{
 	 * @param job
 	 * @throws Exception
 	 */
-	public abstract void validate(Job job) throws Exception;
+	public abstract void validate(Job job) throws JobConfigValidationException;
 	
 	/**
 	 * Implement logic to execute a job.
@@ -46,7 +47,7 @@ public abstract class JobExecutor implements Runnable{
 	 */
 	@Override
 	public void run() {
-		logger.info("JobExecutor.run() Job: {}", job);
+		LOGGER.info("JobExecutor.run() Job: {}", job);
 		try {
 			this.setState(JobState.RUNNING);
 			dao.save(job);
@@ -54,7 +55,7 @@ public abstract class JobExecutor implements Runnable{
 			this.setState(state);
 			dao.save(job);
 		}catch(Exception e) {//Any exception thrown by Job execute implementation should mark Job state as Failed and there should be no side-effects
-			logger.error("JobExecutor.run() ", e);
+			LOGGER.error("JobExecutor.run() ", e);
 			this.setState(JobState.FAILED);
 			dao.save(job);
 		}
@@ -65,7 +66,7 @@ public abstract class JobExecutor implements Runnable{
 	 * @param state
 	 */
 	protected void setState(JobState state) {
-		logger.debug("/setState: state = {}, job = {}", state, job);
+		LOGGER.debug("/setState: state = {}, job = {}", state, job);
 		//Make sure State Change Listener called when there is state change
 		if(this.job.getState() != state && this.getStateChangeListener() != null) {
 			this.stateChangeListener.stateChange(this.job.getJobId(), this.job.getJobName(), state);

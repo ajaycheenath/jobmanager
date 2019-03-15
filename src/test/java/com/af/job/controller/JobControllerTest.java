@@ -53,7 +53,7 @@ public class JobControllerTest {
 	 * verify whether the application context is set
 	 */
 	@Test
-	public void verifyContextInitiated_Test() {
+	public void verifyContextInitiated() {
 		assertNotNull(applicationContext);
 	}
 

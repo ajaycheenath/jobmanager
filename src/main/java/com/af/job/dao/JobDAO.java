@@ -20,20 +20,20 @@ public interface JobDAO {
 	 * Method to save Job object
 	 * @param job
 	 */
-	public void save(Job job);
+	void save(Job job);//interface methods are public by default
 	
 	/**
 	 * Method will return Job object for the jobId passed
 	 * @param jobId
 	 * @return
 	 */
-	public Job getJob(UUID jobId);
+	 Job getJob(UUID jobId);
 	
 	/**
 	 * This method return list of all jobs
 	 * @return
 	 */
-	public List<Job> getAllJobs();
+	 List<Job> getAllJobs();
 	
 
 }

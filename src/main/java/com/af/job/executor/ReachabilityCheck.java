@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
+import com.af.job.config.JobConfigValidationException;
 import com.af.job.core.Job;
 import com.af.job.core.JobExecutor;
 import com.af.job.core.JobState;
@@ -27,12 +28,12 @@ public class ReachabilityCheck extends JobExecutor {
 	public static final String TIME_OUT = "timeOut";
 	
 	@Value("${http.default.timeout:60000}")
-	private int DEFAULT_TIME_OUT;
+	private int httpDefaultTimeout;
 	
 	@Autowired
 	private CommonUtils utils;
 	
-	private Logger logger = LoggerFactory.getLogger(ReachabilityCheck.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ReachabilityCheck.class);
 
 	/**
 	 * This method gets triggered by JobManager when its turn comes.
@@ -44,15 +45,15 @@ public class ReachabilityCheck extends JobExecutor {
 		JobState state = null;
 		String url = job.getConfig(URL);
 		String timeout = job.getConfig(TIME_OUT);
-		int timeoutValue = (timeout == null) ? DEFAULT_TIME_OUT : Integer.parseInt(timeout);
+		int timeoutValue = (timeout == null) ? httpDefaultTimeout : Integer.parseInt(timeout);
 		try {
 			utils.sendGet(url, timeoutValue);
 			state = JobState.SUCCESS;
 		} catch (Exception e) {//TODO: print error in log
-			e.printStackTrace();
+			LOGGER.error("Failed to execute job:  {}", job, e);
 			state = JobState.FAILED;
 		}
-		logger.debug("Done with job {}", job);
+		LOGGER.debug("Done with job {}", job);
 		return state;
 	}
 
@@ -60,9 +61,9 @@ public class ReachabilityCheck extends JobExecutor {
 	 * When a new job gets added, validate method of the jobexecutor gets called to validate the configuration 
 	 */
 	@Override
-	public void validate(Job job) throws Exception {
+	public void validate(Job job) throws JobConfigValidationException {
 		if(job.getConfig(URL) == null) {
-			throw new Exception("Mandatory configuration "+URL+" not found!");
+			throw new JobConfigValidationException("Mandatory configuration "+URL+" not found!");
 		}
 	}
 

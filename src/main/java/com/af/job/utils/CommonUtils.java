@@ -17,16 +17,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class CommonUtils {
 	
-		Logger logger = LoggerFactory.getLogger(CommonUtils.class);
+		private static final Logger LOGGER = LoggerFactory.getLogger(CommonUtils.class);
 		/**
 		 * This method establish an HTTP connection and send GET request to the URL passed as parameter
 		 * @param url
 		 * @param timeout - if the HTTP response takes more than specified time, library will be throwing a timeoutexception (this is to unblock process waiting for response)
 		 * @throws Exception
 		 */
-		public void sendGet(String url, int timeout) throws Exception {
-			logger.debug("/sendGet Sending 'GET' request to URL : " + url);
-			URL obj = new URL(url);
+		public void sendGet(final String url, int timeout) throws Exception {
+			if(LOGGER.isDebugEnabled()) {
+				LOGGER.debug("/sendGet Sending 'GET' request to URL : " + url);
+			}
+			final URL obj = new URL(url);
 			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
 			con.setRequestMethod("GET");
@@ -34,23 +36,23 @@ public class CommonUtils {
 
 			int responseCode = con.getResponseCode();
 			
-			logger.debug("Response Code : {}", responseCode);
+			LOGGER.debug("Response Code : {}", responseCode);
 
 			BufferedReader in = new BufferedReader(
 			        new InputStreamReader(con.getInputStream()));
 			String inputLine;
-			StringBuffer response = new StringBuffer();
+			final StringBuffer response = new StringBuffer();
 
 			while ((inputLine = in.readLine()) != null) {
 				response.append(inputLine);
 			}
 			in.close();
 		
-			logger.debug("/GET "+url+" - got response");
+			LOGGER.debug("/GET "+url+" - got response");
 		}
 		
 		public void sendEmail(Map<String, String> configs) {
-			String toEmailAddress = configs.get("toEmailAddress");
-			logger.debug("Successfuly sent email to "+toEmailAddress);
+			final String toEmailAddress = configs.get("toEmailAddress");
+			LOGGER.debug("Successfuly sent email to "+toEmailAddress);
 		}
 }

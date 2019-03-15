@@ -2,10 +2,13 @@ package com.af.job.executor;
 
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
+import com.af.job.config.JobConfigValidationException;
 import com.af.job.core.Job;
 import com.af.job.core.JobExecutor;
 import com.af.job.core.JobState;
@@ -27,6 +30,7 @@ public class EmailSender extends JobExecutor {
 	@Autowired
 	private CommonUtils utils;
 	
+	private static final Logger LOGGER = LoggerFactory.getLogger(EmailSender.class);
 
 	/**
 	 * This method gets triggered by JobManager when its turn comes.
@@ -42,7 +46,7 @@ public class EmailSender extends JobExecutor {
 			utils.sendEmail(configs);
 			state = JobState.SUCCESS;
 		} catch (Exception e) {//TODO: print error in log
-			e.printStackTrace();
+			LOGGER.error("Failed to send email : {}", job, e);
 			state = JobState.FAILED;
 		}
 		return state;
@@ -52,9 +56,9 @@ public class EmailSender extends JobExecutor {
 	 *When a new job gets added, validate method of the jobexecutor gets called to validate the configuration 
 	 */
 	@Override
-	public void validate(Job job) throws Exception{
+	public void validate(final Job job) throws JobConfigValidationException{
 		if(job.getConfig(TO_ADDRESS) == null) {
-			throw new Exception("Mandatory configuration "+TO_ADDRESS+ " not found");
+			throw new JobConfigValidationException("Mandatory configuration "+TO_ADDRESS+ " not found");
 		}
 	}
 

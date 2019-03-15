@@ -45,7 +45,7 @@ public class JobDAOTest {
 	 * Method to verify application context set properly
 	 */
 	@Test
-	public void verifyContextInitiated_Test() {
+	public void verifyContextInitiated() {
 		assertNotNull(applicationContext);
 	}
 	
@@ -91,7 +91,7 @@ public class JobDAOTest {
 	 * @throws Exception
 	 */
 	@Test
-	public void verifyJobsSortedByPriorityRunAtCreatedTimeOnlyHigh_Priority() throws Exception {
+	public void verifyJobsSortedByPriorityRunAtCreatedTimeOnlyHighPriority() throws Exception {
 		Long currentTime = System.nanoTime();
 		Job job1 = jobUtils.createJob("job1", JobPriority.LOW, null);//6
 		Job job2 = jobUtils.createJob("job2", JobPriority.MEDIUM, null);//4
@@ -138,7 +138,7 @@ public class JobDAOTest {
 		Job job3 = jobUtils.createJob("job3", JobPriority.HIGH, (currentTime * 3));//7
 		Job job4 = jobUtils.createJob("job4", JobPriority.HIGH, (currentTime * 2));//4
 		Job job5 = jobUtils.createJob("job5", JobPriority.LOW, null);//3
-		Job job6 = jobUtils.createJob("job6", JobPriority.MEDIUM, (currentTime * 2));//5
+		Job job6 = jobUtils.createJob("job6", JobPriority.MEDIUM, currentTime * 2);//5
 		Job job7 = jobUtils.createJob("job7", JobPriority.HIGH, null);//1
 		Job job8 = jobUtils.createJob("job8", JobPriority.HIGH, (currentTime * 3));//8
 		
